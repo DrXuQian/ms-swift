@@ -64,6 +64,9 @@ class ModelArguments:
         init_strategy (Optional[str]): The strategy to initialize all uninitialized parameters when loading a model
             (especially for custom architectures). Options include 'zero', 'uniform', 'normal', 'xavier_uniform',
             'xavier_normal', 'kaiming_uniform', 'kaiming_normal', 'orthogonal'. Defaults to None.
+        enable_modelopt_hf (bool): Whether to enable ModelOpt HuggingFace checkpointing plugin before model loading.
+            This allows restoring ModelOpt states (e.g., modelopt_state.pt) when loading checkpoints. Defaults to
+            False.
     """
     model: Optional[str] = None  # model id or model path
     model_type: Optional[str] = field(
@@ -90,6 +93,7 @@ class ModelArguments:
     local_repo_path: Optional[str] = None
     init_strategy: Literal['zero', 'uniform', 'normal', 'xavier_uniform', 'xavier_normal', 'kaiming_uniform',
                            'kaiming_normal', 'orthogonal'] = None
+    enable_modelopt_hf: bool = False
 
     def _init_device_map(self):
         """Prepare device map args"""
@@ -244,4 +248,5 @@ class ModelArguments:
             'num_labels': self.num_labels,
             'problem_type': self.problem_type,
             'init_strategy': self.init_strategy,
+            'enable_modelopt_hf': self.enable_modelopt_hf,
         }

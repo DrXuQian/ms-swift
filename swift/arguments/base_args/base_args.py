@@ -253,6 +253,7 @@ class BaseArguments(GenerationArguments, QuantizeArguments, DataArguments, Templ
             'problem_type',
             'rope_scaling',
             'max_model_len',
+            'enable_modelopt_hf',
             # quant_args
             'quant_method',
             'quant_bits',

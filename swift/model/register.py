@@ -504,6 +504,7 @@ def get_model_processor(
     # model kwargs
     model_type: Optional[str] = None,
     quantization_config=None,
+    enable_modelopt_hf: bool = False,
     max_memory: Union[str, Dict[str, Any]] = None,
     attn_impl: Optional[str] = None,
     experts_impl: Optional[str] = None,
@@ -537,6 +538,8 @@ def get_model_processor(
         # Model configuration
         model_type: Explicit model type when it cannot be uniquely determined from model_id_or_path/config.json.
         quantization_config: Configuration for model quantization.
+        enable_modelopt_hf: Whether to enable ModelOpt HuggingFace checkpointing plugin before
+            calling `from_pretrained`. This allows restoring ModelOpt state from checkpoints.
         max_memory: Maximum memory allocation per device.
         attn_impl: Attention implementation. 'flash_attn' for Flash Attention, None for auto-select (sdpa/eager).
         experts_impl: experts implementation. Options are 'grouped_mm', 'batched_mm', 'eager'. Defaults to None.
@@ -568,6 +571,15 @@ def get_model_processor(
     """
     if load_model:
         patch_mp_ddp()
+    if enable_modelopt_hf and load_model:
+        try:
+            import modelopt.torch.opt as mto
+        except ImportError as e:
+            raise ImportError(
+                '`enable_modelopt_hf=True` requires modelopt to be installed in current environment.'
+            ) from e
+        mto.enable_huggingface_checkpointing()
+        logger.info('ModelOpt HuggingFace checkpointing is enabled.')
     if model_kwargs is None:
         model_kwargs = {}
     if download_model is None:
